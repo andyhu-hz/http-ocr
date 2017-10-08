@@ -10,7 +10,9 @@ set(SRC_LIST
         request.cpp
         multipart_parser.c
         websocket.cpp
+        tesseract.cpp
 )
 
+link_libraries(libtesseract.a)
 add_executable(http-ocr ${SRC_LIST})
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/..)

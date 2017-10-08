@@ -14,6 +14,8 @@
 #include <atomic>
 #include <string>
 
+#include "tesseract.h"
+
 void reead_chunk(boost::shared_ptr<timax::reply::connection> conn)
 {
 	conn->async_read_chunk([conn](boost::string_ref data, intptr_t result)
@@ -128,6 +130,9 @@ int main(int argc, char* argv[])
 						<< boost::locale::conv::between(pair.second, "GB2312", "UTF-8")
 						<< std::endl;
 				}
+
+				string tessertact_output = "";
+				string fname = "";
 				for (auto part : req.multipart_form_data())
 				{
 					std::cout << "***************************************************************************************" << std::endl;
@@ -139,13 +144,15 @@ int main(int argc, char* argv[])
 					auto filename = part.content_disposition().get("filename");	
 					if (!filename.empty())
 					{
+						fname = filename;
 						std::cout << "Received file " << filename << ", file size = " << part.data().size() << std::endl;
 						std::ofstream ofs(filename, std::ios::binary | std::ios::out);
 						ofs.write(part.data().data(), part.data().size());
 					}
 				}
 
-				const std::string tessertact_output = "https://github.com/tesseract-ocr/tesseract/wiki/Command-Line-Usage";
+				//do tesseract then response for client request
+				tessertact_output = ConvertPngToText(fname);
 				rep = timax::reply::uploadfile_reply(timax::reply::ok, tessertact_output);
 			}
 			else if (req.path() == "/websocket")
